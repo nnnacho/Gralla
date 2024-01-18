@@ -1,3 +1,4 @@
+
 const $button = document.querySelector('button')
 
 $button.addEventListener('click', async () => {
@@ -22,3 +23,9 @@ $button.addEventListener('click', async () => {
     link.click()
   })
 })
+
+navigator.mediaDevices.getUserMedia({ audio: true }).then((stream ) => {
+  console.log(stream)
+  let audio = document.getElementById('audio')
+  audio.srcObject = stream
+}).catch((err) => console.log(err))
