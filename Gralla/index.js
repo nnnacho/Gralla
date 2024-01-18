@@ -24,10 +24,6 @@ $button.addEventListener('click', async () => {
   })
 })
 
-
-
-
-
 // Referencias DOM
 const startBtn = document.getElementById('start-record');
 const stopBtn = document.getElementById('stop-record');
