@@ -33,13 +33,13 @@ import IconSection from "../components/IconSection.astro";
         <li>
           <input
             type="checkbox"
-            id="react-option"
+            id="screen-option"
             value=""
             class="hidden peer"
             required=""
           />
           <label
-            for="react-option"
+            for="screen-option"
             class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-[#ff8906] hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
           >
             <div class="block">
@@ -68,14 +68,9 @@ import IconSection from "../components/IconSection.astro";
           </label>
         </li>
         <li>
-          <input
-            type="checkbox"
-            id="flowbite-option"
-            value=""
-            class="hidden peer"
-          />
+          <input type="checkbox" id="mic-option" value="" class="hidden peer" />
           <label
-            for="flowbite-option"
+            for="mic-option"
             class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-[#ff8906] hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
           >
             <div class="block">
@@ -106,12 +101,12 @@ import IconSection from "../components/IconSection.astro";
         <li>
           <input
             type="checkbox"
-            id="angular-option"
+            id="sound-option"
             value=""
             class="hidden peer"
           />
           <label
-            for="angular-option"
+            for="sound-option"
             class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-[#ff8906] hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
           >
             <div class="block">
@@ -143,6 +138,7 @@ import IconSection from "../components/IconSection.astro";
       <div class="mt-8 gap-3 flex justify-center">
         <button
           class="inline-flex justify-center items-center gap-x-3 text-center bg-gradient-to-tl from-[#ff8906] to-[#f25f4c] hover:scale-105 transition-transform border border-transparent text-white text-sm font-medium rounded-md focus:outline-none focus:ring-1 focus:ring-gray-600 py-3 px-4 dark:focus:ring-offset-gray-800"
+          id="recorder"
         >
           Comenzar Grabación
           <svg
@@ -162,4 +158,41 @@ import IconSection from "../components/IconSection.astro";
       </div>
     </section>
   </main>
+  <script>
+    window.onload = () => {
+      const screen = document.getElementById(
+        "screen-option"
+      ) as HTMLInputElement;
+      const mic = document.getElementById("mic-option") as HTMLInputElement;
+      const $button = document.getElementById("recorder")!;
+
+      $button.addEventListener("click", async () => {
+        if (screen.checked) {
+          const media = await navigator.mediaDevices.getDisplayMedia({
+            video: { frameRate: { ideal: 60 } },
+          });
+          const mediarecorder = new MediaRecorder(media, {
+            mimeType: "video/webm;codecs=vp8,opus",
+          });
+          mediarecorder.start();
+
+          const [video] = media.getVideoTracks();
+          video.addEventListener("ended", () => {
+            mediarecorder.stop();
+          });
+
+          mediarecorder.addEventListener("dataavailable", (e) => {
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(e.data);
+            link.download = "captura.mp4";
+            link.click();
+          });
+        } else {
+          console.log("no");
+        }
+        if (mic.checked) {
+        }
+      });
+    };
+  </script>
 </Layout>
