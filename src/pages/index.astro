@@ -381,6 +381,44 @@ import IconSection from "../components/IconSection.astro";
 
             updateClock();
           }
+          if (screen.checked && mic.checked && sound.checked == false) {
+            try {
+              const screenStream = await navigator.mediaDevices.getDisplayMedia(
+                {
+                  video: { frameRate: { ideal: 60 } },
+                }
+              );
+
+              const audioStream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+              });
+
+              const combinedStream = new MediaStream([
+                ...screenStream.getTracks(),
+                ...audioStream.getTracks(),
+              ]);
+
+              const mediarecorder = new MediaRecorder(combinedStream, {
+                mimeType: "video/webm;codecs=vp8,opus",
+              });
+
+              mediarecorder.start();
+
+              const [video] = screenStream.getVideoTracks();
+              video.addEventListener("ended", () => {
+                mediarecorder.stop();
+              });
+
+              mediarecorder.addEventListener("dataavailable", (e) => {
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(e.data);
+                link.download = "captura_con_audio.mp4";
+                link.click();
+              });
+            } catch (error) {
+              console.error("Error capturing screen and microphone:", error);
+            }
+          }
         });
       };
     </script>
