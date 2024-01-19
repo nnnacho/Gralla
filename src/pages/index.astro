@@ -157,13 +157,18 @@ import IconSection from "../components/IconSection.astro";
           <div class="relative rounded-lg bg-white shadow dark:bg-gray-700">
             <!-- Modal header -->
             <div
-              class="flex items-start justify-between rounded-t border-b p-5 dark:border-gray-600"
+              class="flex items-start justify-between rounded-t p-5 dark:border-gray-600"
             >
-              <h3
-                class="ml-2 text-xl font-semibold text-gray-900 dark:text-white"
-                id="title-record-audio"
-              >
-                Grabación de audio
+              <span class="relative flex h-3 w-3 hidden" id="circle-animate">
+                <span
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#f25f4c] opacity-75"
+                ></span>
+                <span
+                  class="relative inline-flex rounded-full h-3 w-3 bg-[#ff8906]"
+                ></span>
+              </span>
+              <h3 class="text-center" id="title-modal">
+                Tú grabación comienza en
               </h3>
               <button
                 type="button"
@@ -189,11 +194,12 @@ import IconSection from "../components/IconSection.astro";
             </div>
             <!-- Modal body -->
             <div class="p-4 md:p-5 space-y-4 text-center">
-              <span id="countdown" class="font-bold text-center"></span>
+              <span id="countdown" class="font-bold text-center text-3xl"
+              ></span>
             </div>
             <!-- Modal footer -->
             <div
-              class="flex items-center justify-center space-x-2 rtl:space-x-reverse rounded-b border-t border-gray-200 p-6 dark:border-gray-600"
+              class="flex items-center justify-center space-x-2 rtl:space-x-reverse rounded-b border-gray-200 p-6 dark:border-gray-600"
             >
               <button
                 type="button"
@@ -247,9 +253,11 @@ import IconSection from "../components/IconSection.astro";
           "sound-option"
         ) as HTMLInputElement;
         const closed = document.getElementById("closed") as HTMLElement;
+        const countdown = document.getElementById("countdown");
 
         const $button = document.getElementById("recorder")!;
-
+        const titleModal = document.getElementById("title-modal");
+        const circleAnimate = document.getElementById("circle-animate");
         $button.addEventListener("click", async () => {
           const modal: ModalInterface = new Modal(
             $modalElement,
@@ -268,7 +276,11 @@ import IconSection from "../components/IconSection.astro";
               text: "Selecciona una opción de grabación",
             });
           }
-          if (screen.checked) {
+          if (
+            screen.checked &&
+            mic.checked === false &&
+            sound.checked === false
+          ) {
             const media = await navigator.mediaDevices.getDisplayMedia({
               video: { frameRate: { ideal: 60 } },
             });
@@ -289,7 +301,11 @@ import IconSection from "../components/IconSection.astro";
               link.click();
             });
           }
-          if (mic.checked) {
+          if (
+            mic.checked &&
+            screen.checked === false &&
+            sound.checked === false
+          ) {
             let chunks = [];
             const stream = await navigator.mediaDevices.getUserMedia({
               audio: true,
@@ -303,26 +319,28 @@ import IconSection from "../components/IconSection.astro";
             closed.addEventListener("click", () => {
               modal.hide();
               stopRecord.setAttribute("disabled", "");
-              title.innerHTML = "Grabación de audio";
+              countdown.classList.remove("animate-pulse");
               stopRecord.classList.add("cursor-not-allowed");
               mediaRecorder.stop();
               mediaStream.getTracks().forEach((track) => track.stop());
               modal.isVisible();
+              titleModal.classList.remove("hidden");
             });
             modal.show();
             let totalTime = 3;
 
             function updateClock() {
-              const countdown = document.getElementById("countdown");
               if (countdown) {
-                countdown.innerHTML =
-                  "La grabación comienza en: " + totalTime.toString();
+                countdown.innerHTML = totalTime.toString();
               }
 
               if (totalTime === 0 && modal.isVisible()) {
                 console.log("grabando");
-                title.innerHTML = "Grabando!";
-                countdown.innerHTML = "";
+                circleAnimate.classList.remove("hidden");
+                titleModal.classList.add("hidden");
+                stopRecord.classList.remove("hidden");
+                countdown.classList.add("animate-pulse");
+                countdown.innerHTML = "Grabando...";
                 stopRecord.classList.remove("cursor-not-allowed");
                 stopRecord.removeAttribute("disabled");
                 mediaRecorder.start();
@@ -338,8 +356,9 @@ import IconSection from "../components/IconSection.astro";
                     link.click();
                     mediaStream.getTracks().forEach((track) => track.stop());
                     stopRecord.setAttribute("disabled", "");
+                    titleModal.classList.remove("hidden");
+                    countdown.classList.remove("animate-pulse");
                     stopRecord.classList.add("cursor-not-allowed");
-                    title.innerHTML = "Grabación de audio";
 
                     // Limpiar chunks
                     chunks = [];
