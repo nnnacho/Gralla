@@ -193,7 +193,7 @@ import IconSection from "../components/IconSection.astro";
             </div>
             <!-- Modal footer -->
             <div
-              class="flex items-center space-x-2 rtl:space-x-reverse rounded-b border-t border-gray-200 p-6 dark:border-gray-600"
+              class="flex items-center justify-center space-x-2 rtl:space-x-reverse rounded-b border-t border-gray-200 p-6 dark:border-gray-600"
             >
               <button
                 type="button"
@@ -304,13 +304,11 @@ import IconSection from "../components/IconSection.astro";
               modal.hide();
               stopRecord.setAttribute("disabled", "");
               title.innerHTML = "Grabación de audio";
+              stopRecord.classList.add("cursor-not-allowed");
               mediaRecorder.stop();
               mediaStream.getTracks().forEach((track) => track.stop());
               modal.isVisible();
             });
-
-            //mic only
-
             modal.show();
             let totalTime = 3;
 
@@ -325,7 +323,7 @@ import IconSection from "../components/IconSection.astro";
                 console.log("grabando");
                 title.innerHTML = "Grabando!";
                 countdown.innerHTML = "";
-                stopRecord.classList.toggle("cursor-not-allowed");
+                stopRecord.classList.remove("cursor-not-allowed");
                 stopRecord.removeAttribute("disabled");
                 mediaRecorder.start();
                 stopRecord.addEventListener("click", () => {
@@ -340,7 +338,7 @@ import IconSection from "../components/IconSection.astro";
                     link.click();
                     mediaStream.getTracks().forEach((track) => track.stop());
                     stopRecord.setAttribute("disabled", "");
-                    stopRecord.classList.toggle("cursor-not-allowed");
+                    stopRecord.classList.add("cursor-not-allowed");
                     title.innerHTML = "Grabación de audio";
 
                     // Limpiar chunks
