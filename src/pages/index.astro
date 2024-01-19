@@ -247,6 +247,10 @@ import IconSection from "../components/IconSection.astro";
         const cam = document.getElementById("cam-option") as HTMLInputElement;
         const closed = document.getElementById("closed") as HTMLElement;
         const video = document.getElementById("video") as HTMLVideoElement;
+        video.addEventListener("loadedmetadata", () => {
+          video.width = video.videoWidth;
+          video.height = video.videoHeight;
+        });
         const countdown = document.getElementById("countdown");
 
         const $button = document.getElementById("recorder")!;
@@ -438,6 +442,7 @@ import IconSection from "../components/IconSection.astro";
               modal.isVisible();
               titleModal.classList.remove("hidden");
               circleAnimate.classList.add("hidden");
+              video.classList.add("hidden");
             });
             modal.show();
             let totalTime = 3;
@@ -455,7 +460,7 @@ import IconSection from "../components/IconSection.astro";
                 circleAnimate.classList.remove("hidden");
                 titleModal.classList.add("hidden");
                 countdown.classList.add("animate-pulse");
-                countdown.innerHTML = "";
+                countdown.innerHTML = "Grabando...";
                 stopRecord.classList.remove("cursor-not-allowed");
                 stopRecord.removeAttribute("disabled");
                 mediaRecorder.start();
@@ -475,6 +480,88 @@ import IconSection from "../components/IconSection.astro";
                     countdown.classList.remove("animate-pulse");
                     circleAnimate.classList.add("hidden");
                     stopRecord.classList.add("cursor-not-allowed");
+                    video.classList.add("hidden");
+
+                    // Limpiar chunks
+                    chunks = [];
+                    modal.hide();
+                  });
+                  mediaRecorder.stop();
+                });
+              } else {
+                if (modal.isVisible()) {
+                  console.log(totalTime);
+                  totalTime -= 1;
+                  setTimeout(updateClock, 1000);
+                } else {
+                  totalTime = 3;
+                }
+              }
+            }
+
+            updateClock();
+          }
+          if (cam.checked && screen.checked === false && mic.checked) {
+            let chunks = [];
+            const stream = await navigator.mediaDevices.getUserMedia({
+              video: true,
+              audio: true,
+            });
+            const mediaStream = stream;
+            const mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.addEventListener("dataavailable", (event) => {
+              chunks.push(event.data);
+            });
+            closed.addEventListener("click", () => {
+              modal.hide();
+              stopRecord.setAttribute("disabled", "");
+              countdown.classList.remove("animate-pulse");
+              stopRecord.classList.add("cursor-not-allowed");
+              mediaRecorder.stop();
+              mediaStream.getTracks().forEach((track) => track.stop());
+              modal.isVisible();
+              titleModal.classList.remove("hidden");
+              circleAnimate.classList.add("hidden");
+              video.classList.add("hidden");
+            });
+            modal.show();
+            let totalTime = 3;
+
+            function updateClock() {
+              if (countdown) {
+                countdown.innerHTML = totalTime.toString();
+              }
+
+              if (totalTime === 0 && modal.isVisible()) {
+                console.log("grabando");
+                video.classList.remove("hidden");
+                video.srcObject = mediaStream;
+                video.onloadedmetadata = (ev) => video.play();
+                circleAnimate.classList.remove("hidden");
+                titleModal.classList.add("hidden");
+                countdown.classList.add("animate-pulse");
+                countdown.innerHTML = "Grabando...";
+                stopRecord.classList.remove("cursor-not-allowed");
+                stopRecord.removeAttribute("disabled");
+                mediaRecorder.start();
+                stopRecord.addEventListener("click", () => {
+                  mediaRecorder.addEventListener("stop", () => {
+                    // Código para descargar
+                    const audioBlob = new Blob(chunks, { type: "video/mp4" });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const link = document.createElement("a");
+                    link.href = audioUrl;
+                    link.download = "recording.mp4";
+                    document.body.appendChild(link);
+                    link.click();
+                    mediaStream.getTracks().forEach((track) => track.stop());
+                    stopRecord.setAttribute("disabled", "");
+                    titleModal.classList.remove("hidden");
+                    countdown.classList.remove("animate-pulse");
+                    circleAnimate.classList.add("hidden");
+                    stopRecord.classList.add("cursor-not-allowed");
+                    video.classList.add("hidden");
 
                     // Limpiar chunks
                     chunks = [];
