@@ -325,6 +325,7 @@ import IconSection from "../components/IconSection.astro";
               mediaStream.getTracks().forEach((track) => track.stop());
               modal.isVisible();
               titleModal.classList.remove("hidden");
+              circleAnimate.classList.add("hidden");
             });
             modal.show();
             let totalTime = 3;
@@ -358,6 +359,7 @@ import IconSection from "../components/IconSection.astro";
                     stopRecord.setAttribute("disabled", "");
                     titleModal.classList.remove("hidden");
                     countdown.classList.remove("animate-pulse");
+                    circleAnimate.classList.add("hidden");
                     stopRecord.classList.add("cursor-not-allowed");
 
                     // Limpiar chunks
