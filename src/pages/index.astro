@@ -99,20 +99,15 @@ import IconSection from "../components/IconSection.astro";
           </label>
         </li>
         <li>
-          <input
-            type="checkbox"
-            id="sound-option"
-            value=""
-            class="hidden peer"
-          />
+          <input type="checkbox" id="cam-option" value="" class="hidden peer" />
           <label
-            for="sound-option"
+            for="cam-option"
             class="transition-all inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-[#ff8906] hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
           >
             <div class="block">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="icon icon-tabler icon-tabler-volume mb-2"
+                class="icon icon-tabler icon-tabler-camera mb-2"
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
@@ -122,14 +117,13 @@ import IconSection from "../components/IconSection.astro";
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 ><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path
-                  d="M15 8a5 5 0 0 1 0 8"></path><path
-                  d="M17.7 5a9 9 0 0 1 0 14"></path><path
-                  d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5"
+                  d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"
+                ></path><path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"
                 ></path></svg
               >
-              <div class="w-full text-lg font-semibold">Sonido</div>
+              <div class="w-full text-lg font-semibold">Cámara</div>
               <div class="w-full text-sm">
-                Graba el sonido de tu computadora de manera nativa.
+                Graba la cámara de tu computadora de manera nativa.
               </div>
             </div>
           </label>
@@ -196,6 +190,7 @@ import IconSection from "../components/IconSection.astro";
             <div class="p-4 md:p-5 space-y-4 text-center">
               <span id="countdown" class="font-bold text-center text-3xl"
               ></span>
+              <video src="" class="hidden" autoplay="true" id="video"></video>
             </div>
             <!-- Modal footer -->
             <div
@@ -249,10 +244,9 @@ import IconSection from "../components/IconSection.astro";
           "screen-option"
         ) as HTMLInputElement;
         const mic = document.getElementById("mic-option") as HTMLInputElement;
-        const sound = document.getElementById(
-          "sound-option"
-        ) as HTMLInputElement;
+        const cam = document.getElementById("cam-option") as HTMLInputElement;
         const closed = document.getElementById("closed") as HTMLElement;
+        const video = document.getElementById("video") as HTMLVideoElement;
         const countdown = document.getElementById("countdown");
 
         const $button = document.getElementById("recorder")!;
@@ -268,7 +262,7 @@ import IconSection from "../components/IconSection.astro";
           if (
             screen.checked == false &&
             mic.checked == false &&
-            sound.checked == false
+            cam.checked == false
           ) {
             Swal.fire({
               icon: "error",
@@ -279,7 +273,7 @@ import IconSection from "../components/IconSection.astro";
           if (
             screen.checked &&
             mic.checked === false &&
-            sound.checked === false
+            cam.checked === false
           ) {
             const media = await navigator.mediaDevices.getDisplayMedia({
               video: { frameRate: { ideal: 60 } },
@@ -304,7 +298,7 @@ import IconSection from "../components/IconSection.astro";
           if (
             mic.checked &&
             screen.checked === false &&
-            sound.checked === false
+            cam.checked === false
           ) {
             let chunks = [];
             const stream = await navigator.mediaDevices.getUserMedia({
@@ -381,7 +375,7 @@ import IconSection from "../components/IconSection.astro";
 
             updateClock();
           }
-          if (screen.checked && mic.checked && sound.checked == false) {
+          if (screen.checked && mic.checked && cam.checked == false) {
             try {
               const screenStream = await navigator.mediaDevices.getDisplayMedia(
                 {
@@ -418,6 +412,88 @@ import IconSection from "../components/IconSection.astro";
             } catch (error) {
               console.error("Error capturing screen and microphone:", error);
             }
+          }
+          if (
+            cam.checked &&
+            screen.checked === false &&
+            mic.checked === false
+          ) {
+            let chunks = [];
+            const stream = await navigator.mediaDevices.getUserMedia({
+              video: true,
+            });
+            const mediaStream = stream;
+            const mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.addEventListener("dataavailable", (event) => {
+              chunks.push(event.data);
+            });
+            closed.addEventListener("click", () => {
+              modal.hide();
+              stopRecord.setAttribute("disabled", "");
+              countdown.classList.remove("animate-pulse");
+              stopRecord.classList.add("cursor-not-allowed");
+              mediaRecorder.stop();
+              mediaStream.getTracks().forEach((track) => track.stop());
+              modal.isVisible();
+              titleModal.classList.remove("hidden");
+              circleAnimate.classList.add("hidden");
+            });
+            modal.show();
+            let totalTime = 3;
+
+            function updateClock() {
+              if (countdown) {
+                countdown.innerHTML = totalTime.toString();
+              }
+
+              if (totalTime === 0 && modal.isVisible()) {
+                console.log("grabando");
+                video.classList.remove("hidden");
+                video.srcObject = mediaStream;
+                video.onloadedmetadata = (ev) => video.play();
+                circleAnimate.classList.remove("hidden");
+                titleModal.classList.add("hidden");
+                countdown.classList.add("animate-pulse");
+                countdown.innerHTML = "";
+                stopRecord.classList.remove("cursor-not-allowed");
+                stopRecord.removeAttribute("disabled");
+                mediaRecorder.start();
+                stopRecord.addEventListener("click", () => {
+                  mediaRecorder.addEventListener("stop", () => {
+                    // Código para descargar
+                    const audioBlob = new Blob(chunks, { type: "video/mp4" });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const link = document.createElement("a");
+                    link.href = audioUrl;
+                    link.download = "recording.mp4";
+                    document.body.appendChild(link);
+                    link.click();
+                    mediaStream.getTracks().forEach((track) => track.stop());
+                    stopRecord.setAttribute("disabled", "");
+                    titleModal.classList.remove("hidden");
+                    countdown.classList.remove("animate-pulse");
+                    circleAnimate.classList.add("hidden");
+                    stopRecord.classList.add("cursor-not-allowed");
+
+                    // Limpiar chunks
+                    chunks = [];
+                    modal.hide();
+                  });
+                  mediaRecorder.stop();
+                });
+              } else {
+                if (modal.isVisible()) {
+                  console.log(totalTime);
+                  totalTime -= 1;
+                  setTimeout(updateClock, 1000);
+                } else {
+                  totalTime = 3;
+                }
+              }
+            }
+
+            updateClock();
           }
         });
       };
