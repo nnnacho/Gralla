@@ -310,10 +310,10 @@ import IconSection from "../components/IconSection.astro";
               }
 
               if (totalTime === 0) {
-                animation.classList.remove("hidden");
+                animation.classList.toggle("hidden");
                 title.innerHTML = "Grabando!";
                 countdown.innerHTML = "";
-                stopRecord.classList.remove("cursor-not-allowed");
+                stopRecord.classList.toggle("cursor-not-allowed");
                 stopRecord.removeAttribute("disabled");
                 mediaRecorder.start();
                 stopRecord.addEventListener("click", () => {
@@ -327,6 +327,10 @@ import IconSection from "../components/IconSection.astro";
                     document.body.appendChild(link);
                     link.click();
                     mediaStream.getTracks().forEach((track) => track.stop());
+                    stopRecord.setAttribute("disabled", "");
+                    stopRecord.classList.toggle("cursor-not-allowed");
+                    title.innerHTML = "Grabación de audio";
+                    animation.classList.toggle("hidden");
                     // Limpiar chunks
                     chunks = [];
                   });
