@@ -217,7 +217,7 @@ import IconSection from "../components/IconSection.astro";
 
       const modalOptions: ModalOptions = {
         placement: "center",
-        backdrop: "dynamic",
+        backdrop: "static",
         backdropClasses:
           "bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40",
         closable: false,
@@ -290,7 +290,6 @@ import IconSection from "../components/IconSection.astro";
             });
           }
           if (mic.checked) {
-            let isRecording = false;
             let chunks = [];
             const stream = await navigator.mediaDevices.getUserMedia({
               audio: true,
@@ -304,9 +303,10 @@ import IconSection from "../components/IconSection.astro";
             closed.addEventListener("click", () => {
               modal.hide();
               stopRecord.setAttribute("disabled", "");
-              stopRecord.classList.toggle("cursor-not-allowed");
               title.innerHTML = "Grabación de audio";
+              mediaRecorder.stop();
               mediaStream.getTracks().forEach((track) => track.stop());
+              modal.isVisible();
             });
 
             //mic only
@@ -321,7 +321,8 @@ import IconSection from "../components/IconSection.astro";
                   "La grabación comienza en: " + totalTime.toString();
               }
 
-              if (totalTime === 0) {
+              if (totalTime === 0 && modal.isVisible()) {
+                console.log("grabando");
                 title.innerHTML = "Grabando!";
                 countdown.innerHTML = "";
                 stopRecord.classList.toggle("cursor-not-allowed");
@@ -349,8 +350,13 @@ import IconSection from "../components/IconSection.astro";
                   mediaRecorder.stop();
                 });
               } else {
-                totalTime -= 1;
-                setTimeout(updateClock, 1000);
+                if (modal.isVisible()) {
+                  console.log(totalTime);
+                  totalTime -= 1;
+                  setTimeout(updateClock, 1000);
+                } else {
+                  totalTime = 3;
+                }
               }
             }
 
