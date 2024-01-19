@@ -145,43 +145,47 @@ import IconSection from "../components/IconSection.astro";
       </div>
 
       <!-- Modal toggle -->
-      <button
-        data-modal-target="default-modal"
-        data-modal-toggle="default-modal"
-        class="hidden text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-        type="button"
-      >
-        Toggle modal
-      </button>
 
-      <!-- Main modal -->
       <div
-        id="default-modal"
+        id="modalEl"
         tabindex="-1"
         aria-hidden="true"
-        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+        class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full overflow-y-auto overflow-x-hidden p-4 md:inset-0"
       >
-        <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <div class="relative max-h-full w-full max-w-2xl">
           <!-- Modal content -->
-          <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+          <div class="relative rounded-lg bg-white shadow dark:bg-gray-700">
             <!-- Modal header -->
             <div
-              class="flex items-center p-4 md:p-5 border-b rounded-t dark:border-gray-600"
+              class="flex items-start justify-between rounded-t border-b p-5 dark:border-gray-600"
             >
-              <span class="hidden relative h-3 w-3 flex" id="animation">
-                <span
-                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"
-                ></span>
-                <span
-                  class="relative inline-flex rounded-full h-3 w-3 bg-[#ff8906]"
-                ></span>
-              </span>
               <h3
                 class="ml-2 text-xl font-semibold text-gray-900 dark:text-white"
                 id="title-record-audio"
               >
                 Grabación de audio
               </h3>
+              <button
+                type="button"
+                id="closed"
+                class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
+              >
+                <svg
+                  class="h-3 w-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 14 14"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
+                </svg>
+                <span class="sr-only">Close modal</span>
+              </button>
             </div>
             <!-- Modal body -->
             <div class="p-4 md:p-5 space-y-4 text-center">
@@ -189,10 +193,9 @@ import IconSection from "../components/IconSection.astro";
             </div>
             <!-- Modal footer -->
             <div
-              class="flex items-center justify-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600"
+              class="flex items-center space-x-2 rtl:space-x-reverse rounded-b border-t border-gray-200 p-6 dark:border-gray-600"
             >
               <button
-                data-modal-hide="default-modal"
                 type="button"
                 disabled
                 id="stop-record"
@@ -206,6 +209,26 @@ import IconSection from "../components/IconSection.astro";
     </section>
 
     <script>
+      import { Modal } from "flowbite";
+      import type { ModalOptions, ModalInterface } from "flowbite";
+      import type { InstanceOptions } from "flowbite";
+
+      const $modalElement: HTMLElement = document.querySelector("#modalEl");
+
+      const modalOptions: ModalOptions = {
+        placement: "center",
+        backdrop: "dynamic",
+        backdropClasses:
+          "bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40",
+        closable: false,
+      };
+
+      // instance options object
+      const instanceOptions: InstanceOptions = {
+        id: "modalEl",
+        override: true,
+      };
+
       import "flowbite";
       import Swal from "sweetalert2";
       window.onload = () => {
@@ -216,7 +239,6 @@ import IconSection from "../components/IconSection.astro";
         const stopRecord = document.getElementById(
           "stop-record"
         ) as HTMLElement;
-        const modal = document.getElementById("default-modal");
         const screen = document.getElementById(
           "screen-option"
         ) as HTMLInputElement;
@@ -224,9 +246,17 @@ import IconSection from "../components/IconSection.astro";
         const sound = document.getElementById(
           "sound-option"
         ) as HTMLInputElement;
+        const closed = document.getElementById("closed") as HTMLElement;
+
         const $button = document.getElementById("recorder")!;
 
         $button.addEventListener("click", async () => {
+          const modal: ModalInterface = new Modal(
+            $modalElement,
+            modalOptions,
+            instanceOptions
+          );
+
           if (
             screen.checked == false &&
             mic.checked == false &&
@@ -258,8 +288,6 @@ import IconSection from "../components/IconSection.astro";
               link.download = "captura.mp4";
               link.click();
             });
-          } else {
-            console.log("no");
           }
           if (mic.checked) {
             let isRecording = false;
@@ -273,12 +301,17 @@ import IconSection from "../components/IconSection.astro";
             mediaRecorder.addEventListener("dataavailable", (event) => {
               chunks.push(event.data);
             });
+            closed.addEventListener("click", () => {
+              modal.hide();
+              stopRecord.setAttribute("disabled", "");
+              stopRecord.classList.toggle("cursor-not-allowed");
+              title.innerHTML = "Grabación de audio";
+              mediaStream.getTracks().forEach((track) => track.stop());
+            });
 
             //mic only
-            const btn = document.querySelector(
-              '[data-modal-toggle="default-modal"]'
-            ) as HTMLElement;
-            btn.click();
+
+            modal.show();
             let totalTime = 3;
 
             function updateClock() {
@@ -289,7 +322,6 @@ import IconSection from "../components/IconSection.astro";
               }
 
               if (totalTime === 0) {
-                animation.classList.toggle("hidden");
                 title.innerHTML = "Grabando!";
                 countdown.innerHTML = "";
                 stopRecord.classList.toggle("cursor-not-allowed");
@@ -309,9 +341,10 @@ import IconSection from "../components/IconSection.astro";
                     stopRecord.setAttribute("disabled", "");
                     stopRecord.classList.toggle("cursor-not-allowed");
                     title.innerHTML = "Grabación de audio";
-                    animation.classList.toggle("hidden");
+
                     // Limpiar chunks
                     chunks = [];
+                    modal.hide();
                   });
                   mediaRecorder.stop();
                 });
