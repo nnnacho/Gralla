@@ -129,7 +129,7 @@ import IconSection from "../components/IconSection.astro";
               >
               <div class="w-full text-lg font-semibold">Sonido</div>
               <div class="w-full text-sm">
-                A TypeScript-based web application framework.
+                Graba el sonido de tu computadora de manera nativa.
               </div>
             </div>
           </label>
@@ -141,58 +141,62 @@ import IconSection from "../components/IconSection.astro";
           id="recorder"
         >
           Comenzar Grabación
-          <svg
-            class="flex-shrink-0 w-4 h-4"
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-          >
-            <path
-              d="M5.27921 2L10.9257 7.64645C11.1209 7.84171 11.1209 8.15829 10.9257 8.35355L5.27921 14"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"></path>
-          </svg>
         </button>
       </div>
     </section>
+
+    <script>
+      import Swal from "sweetalert2";
+      window.onload = () => {
+        const screen = document.getElementById(
+          "screen-option"
+        ) as HTMLInputElement;
+        const mic = document.getElementById("mic-option") as HTMLInputElement;
+        const sound = document.getElementById(
+          "sound-option"
+        ) as HTMLInputElement;
+        const $button = document.getElementById("recorder")!;
+
+        $button.addEventListener("click", async () => {
+          if (
+            screen.checked == false &&
+            mic.checked == false &&
+            sound.checked == false
+          ) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Selecciona una opción de grabación",
+            });
+          }
+          if (screen.checked) {
+            const media = await navigator.mediaDevices.getDisplayMedia({
+              video: { frameRate: { ideal: 60 } },
+            });
+            const mediarecorder = new MediaRecorder(media, {
+              mimeType: "video/webm;codecs=vp8,opus",
+            });
+            mediarecorder.start();
+
+            const [video] = media.getVideoTracks();
+            video.addEventListener("ended", () => {
+              mediarecorder.stop();
+            });
+
+            mediarecorder.addEventListener("dataavailable", (e) => {
+              const link = document.createElement("a");
+              link.href = URL.createObjectURL(e.data);
+              link.download = "captura.mp4";
+              link.click();
+            });
+          } else {
+            console.log("no");
+          }
+          if (mic.checked) {
+            //mic only
+          }
+        });
+      };
+    </script>
   </main>
-  <script>
-    window.onload = () => {
-      const screen = document.getElementById(
-        "screen-option"
-      ) as HTMLInputElement;
-      const mic = document.getElementById("mic-option") as HTMLInputElement;
-      const $button = document.getElementById("recorder")!;
-
-      $button.addEventListener("click", async () => {
-        if (screen.checked) {
-          const media = await navigator.mediaDevices.getDisplayMedia({
-            video: { frameRate: { ideal: 60 } },
-          });
-          const mediarecorder = new MediaRecorder(media, {
-            mimeType: "video/webm;codecs=vp8,opus",
-          });
-          mediarecorder.start();
-
-          const [video] = media.getVideoTracks();
-          video.addEventListener("ended", () => {
-            mediarecorder.stop();
-          });
-
-          mediarecorder.addEventListener("dataavailable", (e) => {
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(e.data);
-            link.download = "captura.mp4";
-            link.click();
-          });
-        } else {
-          console.log("no");
-        }
-        if (mic.checked) {
-        }
-      });
-    };
-  </script>
 </Layout>
