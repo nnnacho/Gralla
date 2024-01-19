@@ -206,7 +206,7 @@ import IconSection from "../components/IconSection.astro";
             </div>
             <!-- Modal body -->
             <div class="p-4 md:p-5 space-y-4">
-              <span id="countdown" class="text-bold"></span>
+              <span id="countdown" class="font-bold"></span>
             </div>
             <!-- Modal footer -->
             <div
@@ -217,7 +217,7 @@ import IconSection from "../components/IconSection.astro";
                 type="button"
                 disabled
                 id="stop-record"
-                class="cursor-not-allowed text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                class="cursor-not-allowed text-white bg-gradient-to-tl from-[#ff8906] to-[#f25f4c] hover:scale-105 transition-all focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >Terminar Grabación</button
               >
             </div>
@@ -283,6 +283,18 @@ import IconSection from "../components/IconSection.astro";
             console.log("no");
           }
           if (mic.checked) {
+            let isRecording = false;
+            let chunks = [];
+            const stream = await navigator.mediaDevices.getUserMedia({
+              audio: true,
+            });
+            const mediaStream = stream;
+            const mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.addEventListener("dataavailable", (event) => {
+              chunks.push(event.data);
+            });
+
             //mic only
             const btn = document.querySelector(
               '[data-modal-toggle="default-modal"]'
@@ -303,6 +315,23 @@ import IconSection from "../components/IconSection.astro";
                 countdown.innerHTML = "";
                 stopRecord.classList.remove("cursor-not-allowed");
                 stopRecord.removeAttribute("disabled");
+                mediaRecorder.start();
+                stopRecord.addEventListener("click", () => {
+                  mediaRecorder.addEventListener("stop", () => {
+                    // Código para descargar
+                    const audioBlob = new Blob(chunks, { type: "audio/mp3" });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const link = document.createElement("a");
+                    link.href = audioUrl;
+                    link.download = "recording.mp3";
+                    document.body.appendChild(link);
+                    link.click();
+                    mediaStream.getTracks().forEach((track) => track.stop());
+                    // Limpiar chunks
+                    chunks = [];
+                  });
+                  mediaRecorder.stop();
+                });
               } else {
                 totalTime -= 1;
                 setTimeout(updateClock, 1000);
