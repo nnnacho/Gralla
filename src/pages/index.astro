@@ -18,7 +18,7 @@ import IconSection from "../components/IconSection.astro";
         class="mb-4 text-2xl font-bold leading-none tracking-tight text-center text-[#fffffe] md:text-5xl lg:text-4xl"
       >
         Selecciona el tipo de <span
-          class="underline underline-offset-3 decoration-8 decoration-[#ff8906]"
+          class="underline underline-offset-3 decoration-4 decoration-[#ff8906]"
           >Grabación</span
         >
       </h1>
@@ -40,7 +40,7 @@ import IconSection from "../components/IconSection.astro";
           />
           <label
             for="screen-option"
-            class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-[#ff8906] hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+            class="transition-all inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-[#ff8906] hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
           >
             <div class="block">
               <svg
@@ -71,7 +71,7 @@ import IconSection from "../components/IconSection.astro";
           <input type="checkbox" id="mic-option" value="" class="hidden peer" />
           <label
             for="mic-option"
-            class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-[#ff8906] hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+            class="transition-all inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-[#ff8906] hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
           >
             <div class="block">
               <svg
@@ -107,7 +107,7 @@ import IconSection from "../components/IconSection.astro";
           />
           <label
             for="sound-option"
-            class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-[#ff8906] hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+            class="transition-all inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-[#ff8906] hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
           >
             <div class="block">
               <svg
@@ -143,11 +143,101 @@ import IconSection from "../components/IconSection.astro";
           Comenzar Grabación
         </button>
       </div>
+
+      <!-- Modal toggle -->
+      <button
+        data-modal-target="default-modal"
+        data-modal-toggle="default-modal"
+        class="hidden text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        type="button"
+      >
+        Toggle modal
+      </button>
+
+      <!-- Main modal -->
+      <div
+        id="default-modal"
+        tabindex="-1"
+        aria-hidden="true"
+        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+      >
+        <div class="relative p-4 w-full max-w-2xl max-h-full">
+          <!-- Modal content -->
+          <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <!-- Modal header -->
+            <div
+              class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
+            >
+              <span class="hidden relative h-3 w-3 flex" id="animation">
+                <span
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"
+                ></span>
+                <span
+                  class="relative inline-flex rounded-full h-3 w-3 bg-[#ff8906]"
+                ></span>
+              </span>
+              <h3
+                class="ml-2 text-xl font-semibold text-gray-900 dark:text-white"
+                id="title-record-audio"
+              >
+                Grabación de audio
+              </h3>
+              <button
+                type="button"
+                class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                data-modal-hide="default-modal"
+              >
+                <svg
+                  class="w-3 h-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 14 14"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
+                </svg>
+                <span class="sr-only">Close modal</span>
+              </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-4 md:p-5 space-y-4">
+              <span id="countdown" class="text-bold"></span>
+            </div>
+            <!-- Modal footer -->
+            <div
+              class="flex items-center justify-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600"
+            >
+              <button
+                data-modal-hide="default-modal"
+                type="button"
+                disabled
+                id="stop-record"
+                class="cursor-not-allowed text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                >Terminar Grabación</button
+              >
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <script>
+      import "flowbite";
       import Swal from "sweetalert2";
       window.onload = () => {
+        const animation = document.getElementById("animation") as HTMLElement;
+        const title = document.getElementById(
+          "title-record-audio"
+        ) as HTMLElement;
+        const stopRecord = document.getElementById(
+          "stop-record"
+        ) as HTMLElement;
+        const modal = document.getElementById("default-modal");
         const screen = document.getElementById(
           "screen-option"
         ) as HTMLInputElement;
@@ -194,6 +284,32 @@ import IconSection from "../components/IconSection.astro";
           }
           if (mic.checked) {
             //mic only
+            const btn = document.querySelector(
+              '[data-modal-toggle="default-modal"]'
+            ) as HTMLElement;
+            btn.click();
+            let totalTime = 3;
+
+            function updateClock() {
+              const countdown = document.getElementById("countdown");
+              if (countdown) {
+                countdown.innerHTML =
+                  "La grabación comienza en: " + totalTime.toString();
+              }
+
+              if (totalTime === 0) {
+                animation.classList.remove("hidden");
+                title.innerHTML = "Grabando!";
+                countdown.innerHTML = "";
+                stopRecord.classList.remove("cursor-not-allowed");
+                stopRecord.removeAttribute("disabled");
+              } else {
+                totalTime -= 1;
+                setTimeout(updateClock, 1000);
+              }
+            }
+
+            updateClock();
           }
         });
       };
