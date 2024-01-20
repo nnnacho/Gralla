@@ -190,400 +190,499 @@ import IconSection from "../components/IconSection.astro";
             <div class="p-4 md:p-5 space-y-4 text-center">
               <span id="countdown" class="font-bold text-center text-3xl"
               ></span>
-              <video src="" class="hidden" autoplay="true" id="video"></video>
-            </div>
-            <!-- Modal footer -->
-            <div
-              class="flex items-center justify-center space-x-2 rtl:space-x-reverse rounded-b border-gray-200 p-6 dark:border-gray-600"
-            >
-              <button
-                type="button"
-                disabled
-                id="stop-record"
-                class="cursor-not-allowed text-white bg-gradient-to-tl from-[#ff8906] to-[#f25f4c] hover:scale-105 transition-all focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >Terminar Grabación</button
+              <video src="" class="hidden" autoplay="true" id="video" muted
+              ></video>
+              <video src="" class="hidden" autoplay="true" id="camara" muted
+              ></video>
+              <div class="hidden">
+                <div
+                  class="flex items-center ps-4 border border-gray-200 rounded dark:border-gray-700"
+                >
+                  <input
+                    id="bordered-radio-1"
+                    type="radio"
+                    value=""
+                    name="bordered-radio"
+                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                  />
+                  <label
+                    for="bordered-radio-1"
+                    class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                    >Arriba - Izquierda</label
+                  >
+                </div>
+                <div
+                  class="flex items-center ps-4 border border-gray-200 rounded dark:border-gray-700"
+                >
+                  <input
+                    checked
+                    id="bordered-radio-2"
+                    type="radio"
+                    value=""
+                    name="bordered-radio"
+                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                  />
+                  <label
+                    for="bordered-radio-2"
+                    class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                    >Arriba - Derecha</label
+                  >
+                </div>
+                <input
+                  id="bordered-radio-1"
+                  type="radio"
+                  value=""
+                  name="bordered-radio"
+                  class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <label
+                  for="bordered-radio-1"
+                  class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                  >Abajo - Izquierda</label
+                >
+              </div>
+              <input
+                id="bordered-radio-1"
+                type="radio"
+                value=""
+                name="bordered-radio"
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label
+                for="bordered-radio-1"
+                class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                >Abajo - Derecha</label
               >
             </div>
           </div>
+
+          <div id="video-container" class="hidden absolute top-10 left-10 z-20">
+            <video id="camera" class="w-40 h-30" autoplay></video>
+          </div>
+          <canvas
+            id="screen-capture"
+            class="absolute top-0 left-0 z-10 hidden"
+            height="720"
+            width="1280"></canvas>
+        </div>
+        <!-- Modal footer -->
+        <div
+          class="flex items-center justify-center space-x-2 rtl:space-x-reverse rounded-b border-gray-200 p-6 dark:border-gray-600"
+        >
+          <button
+            type="button"
+            disabled
+            id="stop-record"
+            class="cursor-not-allowed text-white bg-gradient-to-tl from-[#ff8906] to-[#f25f4c] hover:scale-105 transition-all focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >Terminar Grabación</button
+          >
         </div>
       </div>
     </section>
-
-    <script>
-      import { Modal } from "flowbite";
-      import type { ModalOptions, ModalInterface } from "flowbite";
-      import type { InstanceOptions } from "flowbite";
-
-      const $modalElement: HTMLElement = document.querySelector("#modalEl");
-
-      const modalOptions: ModalOptions = {
-        placement: "center",
-        backdrop: "static",
-        backdropClasses:
-          "bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40",
-        closable: false,
-      };
-
-      // instance options object
-      const instanceOptions: InstanceOptions = {
-        id: "modalEl",
-        override: true,
-      };
-
-      import "flowbite";
-      import Swal from "sweetalert2";
-      window.onload = () => {
-        const animation = document.getElementById("animation") as HTMLElement;
-        const title = document.getElementById(
-          "title-record-audio"
-        ) as HTMLElement;
-        const stopRecord = document.getElementById(
-          "stop-record"
-        ) as HTMLElement;
-        const screen = document.getElementById(
-          "screen-option"
-        ) as HTMLInputElement;
-        const mic = document.getElementById("mic-option") as HTMLInputElement;
-        const cam = document.getElementById("cam-option") as HTMLInputElement;
-        const closed = document.getElementById("closed") as HTMLElement;
-        const video = document.getElementById("video") as HTMLVideoElement;
-        video.addEventListener("loadedmetadata", () => {
-          video.width = video.videoWidth;
-          video.height = video.videoHeight;
-        });
-        const countdown = document.getElementById("countdown");
-
-        const $button = document.getElementById("recorder")!;
-        const titleModal = document.getElementById("title-modal");
-        const circleAnimate = document.getElementById("circle-animate");
-        $button.addEventListener("click", async () => {
-          const modal: ModalInterface = new Modal(
-            $modalElement,
-            modalOptions,
-            instanceOptions
-          );
-
-          if (
-            screen.checked == false &&
-            mic.checked == false &&
-            cam.checked == false
-          ) {
-            Swal.fire({
-              icon: "error",
-              title: "Error",
-              text: "Selecciona una opción de grabación",
-            });
-          }
-          if (
-            screen.checked &&
-            mic.checked === false &&
-            cam.checked === false
-          ) {
-            const media = await navigator.mediaDevices.getDisplayMedia({
-              video: { frameRate: { ideal: 60 } },
-            });
-            const mediarecorder = new MediaRecorder(media, {
-              mimeType: "video/webm;codecs=vp8,opus",
-            });
-            mediarecorder.start();
-
-            const [video] = media.getVideoTracks();
-            video.addEventListener("ended", () => {
-              mediarecorder.stop();
-            });
-
-            mediarecorder.addEventListener("dataavailable", (e) => {
-              const link = document.createElement("a");
-              link.href = URL.createObjectURL(e.data);
-              link.download = "captura.mp4";
-              link.click();
-            });
-          }
-          if (
-            mic.checked &&
-            screen.checked === false &&
-            cam.checked === false
-          ) {
-            let chunks = [];
-            const stream = await navigator.mediaDevices.getUserMedia({
-              audio: true,
-            });
-            const mediaStream = stream;
-            const mediaRecorder = new MediaRecorder(stream);
-
-            mediaRecorder.addEventListener("dataavailable", (event) => {
-              chunks.push(event.data);
-            });
-            closed.addEventListener("click", () => {
-              modal.hide();
-              stopRecord.setAttribute("disabled", "");
-              countdown.classList.remove("animate-pulse");
-              stopRecord.classList.add("cursor-not-allowed");
-              mediaRecorder.stop();
-              mediaStream.getTracks().forEach((track) => track.stop());
-              modal.isVisible();
-              titleModal.classList.remove("hidden");
-              circleAnimate.classList.add("hidden");
-            });
-            modal.show();
-            let totalTime = 3;
-
-            function updateClock() {
-              if (countdown) {
-                countdown.innerHTML = totalTime.toString();
-              }
-
-              if (totalTime === 0 && modal.isVisible()) {
-                console.log("grabando");
-                circleAnimate.classList.remove("hidden");
-                titleModal.classList.add("hidden");
-                stopRecord.classList.remove("hidden");
-                countdown.classList.add("animate-pulse");
-                countdown.innerHTML = "Grabando...";
-                stopRecord.classList.remove("cursor-not-allowed");
-                stopRecord.removeAttribute("disabled");
-                mediaRecorder.start();
-                stopRecord.addEventListener("click", () => {
-                  mediaRecorder.addEventListener("stop", () => {
-                    // Código para descargar
-                    const audioBlob = new Blob(chunks, { type: "audio/mp3" });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    const link = document.createElement("a");
-                    link.href = audioUrl;
-                    link.download = "recording.mp3";
-                    document.body.appendChild(link);
-                    link.click();
-                    mediaStream.getTracks().forEach((track) => track.stop());
-                    stopRecord.setAttribute("disabled", "");
-                    titleModal.classList.remove("hidden");
-                    countdown.classList.remove("animate-pulse");
-                    circleAnimate.classList.add("hidden");
-                    stopRecord.classList.add("cursor-not-allowed");
-
-                    // Limpiar chunks
-                    chunks = [];
-                    modal.hide();
-                  });
-                  mediaRecorder.stop();
-                });
-              } else {
-                if (modal.isVisible()) {
-                  console.log(totalTime);
-                  totalTime -= 1;
-                  setTimeout(updateClock, 1000);
-                } else {
-                  totalTime = 3;
-                }
-              }
-            }
-
-            updateClock();
-          }
-          if (screen.checked && mic.checked && cam.checked == false) {
-            try {
-              const screenStream = await navigator.mediaDevices.getDisplayMedia(
-                {
-                  video: { frameRate: { ideal: 60 } },
-                }
-              );
-
-              const audioStream = await navigator.mediaDevices.getUserMedia({
-                audio: true,
-              });
-
-              const combinedStream = new MediaStream([
-                ...screenStream.getTracks(),
-                ...audioStream.getTracks(),
-              ]);
-
-              const mediarecorder = new MediaRecorder(combinedStream, {
-                mimeType: "video/webm;codecs=vp8,opus",
-              });
-
-              mediarecorder.start();
-
-              const [video] = screenStream.getVideoTracks();
-              video.addEventListener("ended", () => {
-                mediarecorder.stop();
-              });
-
-              mediarecorder.addEventListener("dataavailable", (e) => {
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(e.data);
-                link.download = "captura_con_audio.mp4";
-                link.click();
-              });
-            } catch (error) {
-              console.error("Error capturing screen and microphone:", error);
-            }
-          }
-          if (
-            cam.checked &&
-            screen.checked === false &&
-            mic.checked === false
-          ) {
-            let chunks = [];
-            const stream = await navigator.mediaDevices.getUserMedia({
-              video: true,
-            });
-            const mediaStream = stream;
-            const mediaRecorder = new MediaRecorder(stream);
-
-            mediaRecorder.addEventListener("dataavailable", (event) => {
-              chunks.push(event.data);
-            });
-            closed.addEventListener("click", () => {
-              modal.hide();
-              stopRecord.setAttribute("disabled", "");
-              countdown.classList.remove("animate-pulse");
-              stopRecord.classList.add("cursor-not-allowed");
-              mediaRecorder.stop();
-              mediaStream.getTracks().forEach((track) => track.stop());
-              modal.isVisible();
-              titleModal.classList.remove("hidden");
-              circleAnimate.classList.add("hidden");
-              video.classList.add("hidden");
-            });
-            modal.show();
-            let totalTime = 3;
-
-            function updateClock() {
-              if (countdown) {
-                countdown.innerHTML = totalTime.toString();
-              }
-
-              if (totalTime === 0 && modal.isVisible()) {
-                console.log("grabando");
-                video.classList.remove("hidden");
-                video.srcObject = mediaStream;
-                video.onloadedmetadata = (ev) => video.play();
-                circleAnimate.classList.remove("hidden");
-                titleModal.classList.add("hidden");
-                countdown.classList.add("animate-pulse");
-                countdown.innerHTML = "Grabando...";
-                stopRecord.classList.remove("cursor-not-allowed");
-                stopRecord.removeAttribute("disabled");
-                mediaRecorder.start();
-                stopRecord.addEventListener("click", () => {
-                  mediaRecorder.addEventListener("stop", () => {
-                    // Código para descargar
-                    const audioBlob = new Blob(chunks, { type: "video/mp4" });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    const link = document.createElement("a");
-                    link.href = audioUrl;
-                    link.download = "recording.mp4";
-                    document.body.appendChild(link);
-                    link.click();
-                    mediaStream.getTracks().forEach((track) => track.stop());
-                    stopRecord.setAttribute("disabled", "");
-                    titleModal.classList.remove("hidden");
-                    countdown.classList.remove("animate-pulse");
-                    circleAnimate.classList.add("hidden");
-                    stopRecord.classList.add("cursor-not-allowed");
-                    video.classList.add("hidden");
-
-                    // Limpiar chunks
-                    chunks = [];
-                    modal.hide();
-                  });
-                  mediaRecorder.stop();
-                });
-              } else {
-                if (modal.isVisible()) {
-                  console.log(totalTime);
-                  totalTime -= 1;
-                  setTimeout(updateClock, 1000);
-                } else {
-                  totalTime = 3;
-                }
-              }
-            }
-
-            updateClock();
-          }
-          if (cam.checked && screen.checked === false && mic.checked) {
-            let chunks = [];
-            const stream = await navigator.mediaDevices.getUserMedia({
-              video: true,
-              audio: true,
-            });
-            const mediaStream = stream;
-            const mediaRecorder = new MediaRecorder(stream);
-
-            mediaRecorder.addEventListener("dataavailable", (event) => {
-              chunks.push(event.data);
-            });
-            closed.addEventListener("click", () => {
-              modal.hide();
-              stopRecord.setAttribute("disabled", "");
-              countdown.classList.remove("animate-pulse");
-              stopRecord.classList.add("cursor-not-allowed");
-              mediaRecorder.stop();
-              mediaStream.getTracks().forEach((track) => track.stop());
-              modal.isVisible();
-              titleModal.classList.remove("hidden");
-              circleAnimate.classList.add("hidden");
-              video.classList.add("hidden");
-            });
-            modal.show();
-            let totalTime = 3;
-
-            function updateClock() {
-              if (countdown) {
-                countdown.innerHTML = totalTime.toString();
-              }
-
-              if (totalTime === 0 && modal.isVisible()) {
-                console.log("grabando");
-                video.classList.remove("hidden");
-                video.srcObject = mediaStream;
-                video.onloadedmetadata = (ev) => video.play();
-                circleAnimate.classList.remove("hidden");
-                titleModal.classList.add("hidden");
-                countdown.classList.add("animate-pulse");
-                countdown.innerHTML = "Grabando...";
-                stopRecord.classList.remove("cursor-not-allowed");
-                stopRecord.removeAttribute("disabled");
-                mediaRecorder.start();
-                stopRecord.addEventListener("click", () => {
-                  mediaRecorder.addEventListener("stop", () => {
-                    // Código para descargar
-                    const audioBlob = new Blob(chunks, { type: "video/mp4" });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    const link = document.createElement("a");
-                    link.href = audioUrl;
-                    link.download = "recording.mp4";
-                    document.body.appendChild(link);
-                    link.click();
-                    mediaStream.getTracks().forEach((track) => track.stop());
-                    stopRecord.setAttribute("disabled", "");
-                    titleModal.classList.remove("hidden");
-                    countdown.classList.remove("animate-pulse");
-                    circleAnimate.classList.add("hidden");
-                    stopRecord.classList.add("cursor-not-allowed");
-                    video.classList.add("hidden");
-
-                    // Limpiar chunks
-                    chunks = [];
-                    modal.hide();
-                  });
-                  mediaRecorder.stop();
-                });
-              } else {
-                if (modal.isVisible()) {
-                  console.log(totalTime);
-                  totalTime -= 1;
-                  setTimeout(updateClock, 1000);
-                } else {
-                  totalTime = 3;
-                }
-              }
-            }
-
-            updateClock();
-          }
-        });
-      };
-    </script>
   </main>
 </Layout>
+
+<script>
+  import { Modal } from "flowbite";
+  import type { ModalOptions, ModalInterface } from "flowbite";
+  import type { InstanceOptions } from "flowbite";
+
+  const $modalElement: HTMLElement = document.querySelector("#modalEl");
+
+  const modalOptions: ModalOptions = {
+    placement: "center",
+    backdrop: "static",
+    backdropClasses: "bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40",
+    closable: false,
+  };
+
+  // instance options object
+  const instanceOptions: InstanceOptions = {
+    id: "modalEl",
+    override: true,
+  };
+
+  import "flowbite";
+  import Swal from "sweetalert2";
+  window.onload = () => {
+    const animation = document.getElementById("animation") as HTMLElement;
+    const title = document.getElementById("title-record-audio") as HTMLElement;
+    const stopRecord = document.getElementById("stop-record") as HTMLElement;
+    const screen = document.getElementById("screen-option") as HTMLInputElement;
+    const mic = document.getElementById("mic-option") as HTMLInputElement;
+    const cam = document.getElementById("cam-option") as HTMLInputElement;
+    const closed = document.getElementById("closed") as HTMLElement;
+    const video = document.getElementById("video") as HTMLVideoElement;
+    const camara = document.getElementById("camara") as HTMLVideoElement;
+    const videoElement = document.getElementById(
+      "output-video"
+    ) as HTMLVideoElement;
+    const countdown = document.getElementById("countdown");
+
+    const $button = document.getElementById("recorder")!;
+    const titleModal = document.getElementById("title-modal");
+    const circleAnimate = document.getElementById("circle-animate");
+    $button.addEventListener("click", async () => {
+      const modal: ModalInterface = new Modal(
+        $modalElement,
+        modalOptions,
+        instanceOptions
+      );
+
+      if (
+        screen.checked == false &&
+        mic.checked == false &&
+        cam.checked == false
+      ) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Selecciona una opción de grabación",
+        });
+      }
+      if (screen.checked && mic.checked === false && cam.checked === false) {
+        const media = await navigator.mediaDevices.getDisplayMedia({
+          video: { frameRate: { ideal: 60 } },
+        });
+        const mediarecorder = new MediaRecorder(media, {
+          mimeType: "video/webm;codecs=vp8,opus",
+        });
+        mediarecorder.start();
+
+        const [video] = media.getVideoTracks();
+        video.addEventListener("ended", () => {
+          mediarecorder.stop();
+        });
+
+        mediarecorder.addEventListener("dataavailable", (e) => {
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(e.data);
+          link.download = "captura.mp4";
+          link.click();
+        });
+      }
+      if (mic.checked && screen.checked === false && cam.checked === false) {
+        let chunks = [];
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        const mediaStream = stream;
+        const mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.addEventListener("dataavailable", (event) => {
+          chunks.push(event.data);
+        });
+        closed.addEventListener("click", () => {
+          modal.hide();
+          stopRecord.setAttribute("disabled", "");
+          countdown.classList.remove("animate-pulse");
+          stopRecord.classList.add("cursor-not-allowed");
+          mediaRecorder.stop();
+          mediaStream.getTracks().forEach((track) => track.stop());
+          modal.isVisible();
+          titleModal.classList.remove("hidden");
+          circleAnimate.classList.add("hidden");
+        });
+        modal.show();
+        let totalTime = 3;
+
+        function updateClock() {
+          if (countdown) {
+            countdown.innerHTML = totalTime.toString();
+          }
+
+          if (totalTime === 0 && modal.isVisible()) {
+            console.log("grabando");
+            circleAnimate.classList.remove("hidden");
+            titleModal.classList.add("hidden");
+            stopRecord.classList.remove("hidden");
+            countdown.classList.add("animate-pulse");
+            countdown.innerHTML = "Grabando...";
+            stopRecord.classList.remove("cursor-not-allowed");
+            stopRecord.removeAttribute("disabled");
+            mediaRecorder.start();
+            stopRecord.addEventListener("click", () => {
+              mediaRecorder.addEventListener("stop", () => {
+                // Código para descargar
+                const audioBlob = new Blob(chunks, { type: "audio/mp3" });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const link = document.createElement("a");
+                link.href = audioUrl;
+                link.download = "recording.mp3";
+                document.body.appendChild(link);
+                link.click();
+                mediaStream.getTracks().forEach((track) => track.stop());
+                stopRecord.setAttribute("disabled", "");
+                titleModal.classList.remove("hidden");
+                countdown.classList.remove("animate-pulse");
+                circleAnimate.classList.add("hidden");
+                stopRecord.classList.add("cursor-not-allowed");
+
+                // Limpiar chunks
+                chunks = [];
+                modal.hide();
+              });
+              mediaRecorder.stop();
+            });
+          } else {
+            if (modal.isVisible()) {
+              console.log(totalTime);
+              totalTime -= 1;
+              setTimeout(updateClock, 1000);
+            } else {
+              totalTime = 3;
+            }
+          }
+        }
+
+        updateClock();
+      }
+      if (screen.checked && mic.checked && cam.checked == false) {
+        try {
+          const screenStream = await navigator.mediaDevices.getDisplayMedia({
+            video: { frameRate: { ideal: 60 } },
+          });
+
+          const audioStream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+          });
+
+          const combinedStream = new MediaStream([
+            ...screenStream.getTracks(),
+            ...audioStream.getTracks(),
+          ]);
+
+          const mediarecorder = new MediaRecorder(combinedStream, {
+            mimeType: "video/webm;codecs=vp8,opus",
+          });
+
+          mediarecorder.start();
+
+          const [video] = screenStream.getVideoTracks();
+          video.addEventListener("ended", () => {
+            mediarecorder.stop();
+          });
+
+          mediarecorder.addEventListener("dataavailable", (e) => {
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(e.data);
+            link.download = "captura_con_audio.mp4";
+            link.click();
+          });
+        } catch (error) {
+          console.error("Error capturing screen and microphone:", error);
+        }
+      }
+      if (cam.checked && screen.checked === false && mic.checked === false) {
+        let chunks = [];
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+        });
+        const mediaStream = stream;
+        const mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.addEventListener("dataavailable", (event) => {
+          chunks.push(event.data);
+        });
+        closed.addEventListener("click", () => {
+          modal.hide();
+          stopRecord.setAttribute("disabled", "");
+          countdown.classList.remove("animate-pulse");
+          stopRecord.classList.add("cursor-not-allowed");
+          mediaRecorder.stop();
+          mediaStream.getTracks().forEach((track) => track.stop());
+          modal.isVisible();
+          titleModal.classList.remove("hidden");
+          circleAnimate.classList.add("hidden");
+          video.classList.add("hidden");
+        });
+        modal.show();
+        let totalTime = 3;
+
+        function updateClock() {
+          if (countdown) {
+            countdown.innerHTML = totalTime.toString();
+          }
+
+          if (totalTime === 0 && modal.isVisible()) {
+            console.log("grabando");
+            video.classList.remove("hidden");
+            video.srcObject = mediaStream;
+            video.onloadedmetadata = (ev) => video.play();
+            circleAnimate.classList.remove("hidden");
+            titleModal.classList.add("hidden");
+            countdown.classList.add("animate-pulse");
+            countdown.innerHTML = "Grabando...";
+            stopRecord.classList.remove("cursor-not-allowed");
+            stopRecord.removeAttribute("disabled");
+            mediaRecorder.start();
+            stopRecord.addEventListener("click", () => {
+              mediaRecorder.addEventListener("stop", () => {
+                // Código para descargar
+                const audioBlob = new Blob(chunks, { type: "video/mp4" });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const link = document.createElement("a");
+                link.href = audioUrl;
+                link.download = "recording.mp4";
+                document.body.appendChild(link);
+                link.click();
+                mediaStream.getTracks().forEach((track) => track.stop());
+                stopRecord.setAttribute("disabled", "");
+                titleModal.classList.remove("hidden");
+                countdown.classList.remove("animate-pulse");
+                circleAnimate.classList.add("hidden");
+                stopRecord.classList.add("cursor-not-allowed");
+                video.classList.add("hidden");
+
+                // Limpiar chunks
+                chunks = [];
+                modal.hide();
+              });
+              mediaRecorder.stop();
+            });
+          } else {
+            if (modal.isVisible()) {
+              console.log(totalTime);
+              totalTime -= 1;
+              setTimeout(updateClock, 1000);
+            } else {
+              totalTime = 3;
+            }
+          }
+        }
+
+        updateClock();
+      }
+      if (cam.checked && screen.checked === false && mic.checked) {
+        let chunks = [];
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+        const mediaStream = stream;
+        const mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.addEventListener("dataavailable", (event) => {
+          chunks.push(event.data);
+        });
+        closed.addEventListener("click", () => {
+          modal.hide();
+          stopRecord.setAttribute("disabled", "");
+          countdown.classList.remove("animate-pulse");
+          stopRecord.classList.add("cursor-not-allowed");
+          mediaRecorder.stop();
+          mediaStream.getTracks().forEach((track) => track.stop());
+          modal.isVisible();
+          titleModal.classList.remove("hidden");
+          circleAnimate.classList.add("hidden");
+          video.classList.add("hidden");
+        });
+        modal.show();
+        let totalTime = 3;
+
+        function updateClock() {
+          if (countdown) {
+            countdown.innerHTML = totalTime.toString();
+          }
+
+          if (totalTime === 0 && modal.isVisible()) {
+            console.log("grabando");
+            video.classList.remove("hidden");
+            video.srcObject = mediaStream;
+            video.onloadedmetadata = (ev) => video.play();
+            circleAnimate.classList.remove("hidden");
+            titleModal.classList.add("hidden");
+            countdown.classList.add("animate-pulse");
+            countdown.innerHTML = "Grabando...";
+            stopRecord.classList.remove("cursor-not-allowed");
+            stopRecord.removeAttribute("disabled");
+            mediaRecorder.start();
+            stopRecord.addEventListener("click", () => {
+              mediaRecorder.addEventListener("stop", () => {
+                // Código para descargar
+                const audioBlob = new Blob(chunks, { type: "video/mp4" });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const link = document.createElement("a");
+                link.href = audioUrl;
+                link.download = "recording.mp4";
+                document.body.appendChild(link);
+                link.click();
+                mediaStream.getTracks().forEach((track) => track.stop());
+                stopRecord.setAttribute("disabled", "");
+                titleModal.classList.remove("hidden");
+                countdown.classList.remove("animate-pulse");
+                circleAnimate.classList.add("hidden");
+                stopRecord.classList.add("cursor-not-allowed");
+                video.classList.add("hidden");
+
+                // Limpiar chunks
+                chunks = [];
+                modal.hide();
+              });
+              mediaRecorder.stop();
+            });
+          } else {
+            if (modal.isVisible()) {
+              console.log(totalTime);
+              totalTime -= 1;
+              setTimeout(updateClock, 1000);
+            } else {
+              totalTime = 3;
+            }
+          }
+        }
+
+        updateClock();
+      }
+      //retomar desde aquí
+      if (screen.checked && cam.checked && mic.checked == false) {
+        // Acceder a la cámara
+        // Acceder a la cámara
+        navigator.mediaDevices
+          .getUserMedia({ video: true })
+          .then(function (stream) {
+            var video = document.getElementById("camera") as HTMLVideoElement;
+            video.srcObject = stream;
+          })
+          .catch(function (err) {
+            console.error("Error al acceder a la cámara: ", err);
+          });
+
+        // Capturar la pantalla
+        var screenCaptureCanvas = document.getElementById(
+          "screen-capture"
+        ) as HTMLCanvasElement;
+        var screenCaptureContext = screenCaptureCanvas.getContext("2d");
+
+        navigator.mediaDevices
+          .getDisplayMedia({ video: { width: 1920, height: 1080 } })
+          .then(function (screenStream) {
+            var screenCapture = document.createElement("video");
+            screenCapture.srcObject = screenStream;
+
+            screenCapture.onloadedmetadata = function () {
+              screenCapture.play();
+              drawOnCanvas(screenCapture);
+            };
+          })
+          .catch(function (err) {
+            console.error("Error al capturar la pantalla: ", err);
+          });
+
+        // Dibujar la pantalla capturada en el canvas
+        function drawOnCanvas(videoElement) {
+          screenCaptureContext.drawImage(
+            videoElement,
+            0,
+            0,
+            screenCaptureCanvas.width,
+            screenCaptureCanvas.height
+          );
+          requestAnimationFrame(function () {
+            drawOnCanvas(videoElement);
+          });
+        }
+      }
+    });
+  };
+</script>
