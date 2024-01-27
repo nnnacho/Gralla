@@ -1,89 +1,62 @@
 import { Modal } from "flowbite";
+import Toastify from "toastify-js";
+import "flowbite";
 import type { ModalOptions, ModalInterface } from "flowbite";
 import type { InstanceOptions } from "flowbite";
-const $modalElementTwo: HTMLElement = document.querySelector("#modal-two");
 
-const modalOptionsTwo: ModalOptions = {
-  placement: "center",
-  backdrop: "dynamic",
-  backdropClasses: "bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40",
-  closable: true,
-  onHide: () => {
-    console.log("modal is hidden");
-  },
-  onShow: () => {
-    console.log("modal is shown");
-  },
-  onToggle: () => {
-    console.log("modal has been toggled");
-  },
-};
-
-// instance options object
-const instanceOptionsTwo: InstanceOptions = {
-  id: "modalEl",
-  override: true,
-};
-
-const modalTwo: ModalInterface = new Modal(
-  $modalElementTwo,
-  modalOptionsTwo,
-  instanceOptionsTwo
-);
-const $modalElement: HTMLElement = document.querySelector("#modalEl");
-
-const modalOptions: ModalOptions = {
-  placement: "center",
-  backdrop: "static",
-  backdropClasses: "bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40",
-  closable: false,
-};
-
-// instance options object
-const instanceOptions: InstanceOptions = {
-  id: "modalEl",
-  override: true,
-};
-
-import "flowbite";
-import Swal from "sweetalert2";
 window.onload = () => {
-  const animation = document.getElementById("animation") as HTMLElement;
-  const title = document.getElementById("title-record-audio") as HTMLElement;
+  const $modalElement: HTMLElement = document.querySelector("#modalEl");
   const stopRecord = document.getElementById("stop-record") as HTMLElement;
   const screen = document.getElementById("screen-option") as HTMLInputElement;
   const mic = document.getElementById("mic-option") as HTMLInputElement;
   const cam = document.getElementById("cam-option") as HTMLInputElement;
   const closed = document.getElementById("closed") as HTMLElement;
   const video = document.getElementById("video") as HTMLVideoElement;
-  const camara = document.getElementById("camara") as HTMLVideoElement;
-  const videoElement = document.getElementById(
-    "output-video"
-  ) as HTMLVideoElement;
   const countdown = document.getElementById("countdown");
-
   const $button = document.getElementById("recorder")!;
   const titleModal = document.getElementById("title-modal");
   const circleAnimate = document.getElementById("circle-animate");
 
+  //opciones del modal
+  const modalOptions: ModalOptions = {
+    placement: "center",
+    backdrop: "static",
+    backdropClasses: "bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40",
+    closable: false,
+  };
+  const instanceOptions: InstanceOptions = {
+    id: "modalEl",
+    override: true,
+  };
+
+  //evento que se ejecuta cuando se clickea en el botón de "grabar"
   $button.addEventListener("click", async () => {
     const modal: ModalInterface = new Modal(
       $modalElement,
       modalOptions,
       instanceOptions
     );
-
+    //si no se selecciona ninguna opción se lanza un toast de adventencia.
     if (
       screen.checked == false &&
       mic.checked == false &&
       cam.checked == false
     ) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Selecciona una opción de grabación",
-      });
+      Toastify({
+        text: "Seleccione al menos una opcion .",
+        duration: 1500,
+        newWindow: true,
+        close: false,
+        gravity: "top",
+        position: "right",
+        style: {
+          background: "linear-gradient(to right, #f25f4c, #ff8906)",
+        },
+        onClick: function () {},
+      }).showToast();
     }
+
+    //Evento que se ejecuta cuando se selecciona la opción de grabar "Pantalla"
     if (screen.checked && mic.checked === false && cam.checked === false) {
       const media = await navigator.mediaDevices.getDisplayMedia({
         video: { frameRate: { ideal: 60 } },
@@ -105,6 +78,7 @@ window.onload = () => {
         link.click();
       });
     }
+    //Evento que se ejecuta cuando se selecciona la opción de grabar "Microfono"
     if (mic.checked && screen.checked === false && cam.checked === false) {
       let chunks = [];
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -161,8 +135,6 @@ window.onload = () => {
               countdown.classList.remove("animate-pulse");
               circleAnimate.classList.add("hidden");
               stopRecord.classList.add("cursor-not-allowed");
-
-              // Limpiar chunks
               chunks = [];
               modal.hide();
             });
@@ -181,6 +153,7 @@ window.onload = () => {
 
       updateClock();
     }
+    //Evento que se ejecuta cuando se selecciona la opción de grabar "Pantalla y Microfono"
     if (screen.checked && mic.checked && cam.checked == false) {
       try {
         const screenStream = await navigator.mediaDevices.getDisplayMedia({
@@ -217,6 +190,7 @@ window.onload = () => {
         console.error("Error capturing screen and microphone:", error);
       }
     }
+    //Evento que se ejecuta cuando se selecciona la opción de grabar "Camara"
     if (cam.checked && screen.checked === false && mic.checked === false) {
       let chunks = [];
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -297,6 +271,7 @@ window.onload = () => {
 
       updateClock();
     }
+    //Evento que se ejecuta cuando se selecciona la opción de grabar "Camara y Microfono"
     if (cam.checked && screen.checked === false && mic.checked) {
       let chunks = [];
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -378,87 +353,35 @@ window.onload = () => {
 
       updateClock();
     }
-    //retomar desde aquí
+    //Funciones aun no realizadas
     if (screen.checked && cam.checked && mic.checked == false) {
-      modalTwo.show();
-      const startRecord = document.getElementById("stop");
-      const stopRecord = document.getElementById("stopdos");
-      const cameraStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-      });
-      const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-      const media = await navigator.mediaDevices.getDisplayMedia({
-        video: { frameRate: { ideal: 60 } },
-      });
-      const mediaStream = media;
-      const context = canvas.getContext("2d");
-      const videoElement = document.createElement("video");
-      videoElement.srcObject = media;
-      videoElement.autoplay = true;
-      const video2 = document.createElement("video");
-      video2.srcObject = cameraStream;
-      video2.autoplay = true;
-      videoElement.addEventListener("loadedmetadata", function () {
-        canvas.width = videoElement.videoWidth;
-        canvas.height = videoElement.videoHeight;
-      });
-      videoElement.addEventListener("loadeddata", function () {
-        video2.addEventListener("loadeddata", function () {
-          requestAnimationFrame(draw);
-        });
-      });
-      function draw() {
-        // Dibuja el fotograma actual del video en el canvas
-        context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-
-        // Vuelve a llamar a la función para el siguiente cuadro de animación
-        const cameraWidth = 160; // ajusta el ancho de la cámara según tus preferencias
-        const cameraHeight =
-          (cameraWidth / video2.videoWidth) * video2.videoHeight;
-        context.drawImage(video2, 10, 10, cameraWidth, cameraHeight);
-
-        // Vuelve a llamar a la función para el siguiente cuadro de animación
-        requestAnimationFrame(draw);
-      }
-      let mediaRecorder;
-      let recordedBlobs;
-      startRecord.addEventListener("click", () => {
-        console.log("Grabando");
-        const stream = canvas.captureStream();
-
-        // Iniciar MediaRecorder
-        recordedBlobs = [];
-        mediaRecorder = new MediaRecorder(stream);
-
-        // Manejar datos grabados
-        mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            recordedBlobs.push(event.data);
-          }
-        };
-
-        // Iniciar grabación
-        mediaRecorder.start();
-        startRecord.innerHTML = "Terminar Grabación";
-      });
-      stopRecord.addEventListener("click", () => {
-        console.log("Terminó la grabación");
-        mediaRecorder.stop();
-
-        // Descargar el video grabado
-        const blob = new Blob(recordedBlobs, { type: "video/mp4" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.style.display = "none";
-        a.href = url;
-        a.download = "canvas.mp4";
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
-        }, 100);
-      });
+      Toastify({
+        text: "Esta funcionalidad aún no existe.",
+        duration: 1500,
+        newWindow: true,
+        close: false,
+        gravity: "top",
+        position: "right",
+        style: {
+          background: "linear-gradient(to right, #f25f4c, #ff8906)",
+        },
+        onClick: function () {}, // Callback after click
+      }).showToast();
+    }
+    //Funciones aun no realizadas
+    if (screen.checked && cam.checked && mic.checked) {
+      Toastify({
+        text: "Esta funcionalidad aún no existe.",
+        duration: 1500,
+        newWindow: true,
+        close: false,
+        gravity: "top",
+        position: "right",
+        style: {
+          background: "linear-gradient(to right, #f25f4c, #ff8906)",
+        },
+        onClick: function () {}, // Callback after click
+      }).showToast();
     }
   });
 };
