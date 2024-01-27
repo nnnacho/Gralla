@@ -90,17 +90,6 @@ window.onload = () => {
       mediaRecorder.addEventListener("dataavailable", (event) => {
         chunks.push(event.data);
       });
-      closed.addEventListener("click", () => {
-        modal.hide();
-        stopRecord.setAttribute("disabled", "");
-        countdown.classList.remove("animate-pulse");
-        stopRecord.classList.add("cursor-not-allowed");
-        mediaRecorder.stop();
-        mediaStream.getTracks().forEach((track) => track.stop());
-        modal.isVisible();
-        titleModal.classList.remove("hidden");
-        circleAnimate.classList.add("hidden");
-      });
       modal.show();
       let totalTime = 3;
 
@@ -150,8 +139,18 @@ window.onload = () => {
           }
         }
       }
-
       updateClock();
+      closed.addEventListener("click", () => {
+        modal.hide();
+        stopRecord.setAttribute("disabled", "");
+        countdown.classList.remove("animate-pulse");
+        stopRecord.classList.add("cursor-not-allowed");
+        mediaRecorder.stop();
+        mediaStream.getTracks().forEach((track) => track.stop());
+        modal.isVisible();
+        titleModal.classList.remove("hidden");
+        circleAnimate.classList.add("hidden");
+      });
     }
     //Evento que se ejecuta cuando se selecciona la opción de grabar "Pantalla y Microfono"
     if (screen.checked && mic.checked && cam.checked == false) {
