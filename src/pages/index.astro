@@ -230,7 +230,7 @@ import IconSection from "../components/IconSection.astro";
                 ></span>
               </span>
               <h3 class="text-center" id="title-modal-2">
-                Tú grabación comienza en
+                Opciones de grabación
               </h3>
               <button
                 type="button"
@@ -256,19 +256,9 @@ import IconSection from "../components/IconSection.astro";
             </div>
             <!-- Modal body -->
             <div class="space-y-6 p-6">
-              <span id="countdown-2" class="font-bold text-center text-3xl"
-              ></span>
-              <div
-                id="video-container"
-                class="absolute top-10 left-10 z-20 hidden"
-              >
-                <video id="camera" class="w-40 h-30" autoplay></video>
+              <div class="flex w-[960] h-[540px] relative justify-center">
+                <canvas id="canvas"></canvas>
               </div>
-              <canvas
-                id="screen-capture"
-                class="absolute top-0 left-0 z-10 hidden"
-                height="720"
-                width="1280"></canvas>
             </div>
             <!-- Modal footer -->
             <div
@@ -276,9 +266,14 @@ import IconSection from "../components/IconSection.astro";
             >
               <button
                 type="button"
-                disabled
-                id="stop-record-2"
-                class="cursor-not-allowed text-white bg-gradient-to-tl from-[#ff8906] to-[#f25f4c] hover:scale-105 transition-all focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                id="stop"
+                class="cursor-pointer text-white bg-gradient-to-tl from-[#ff8906] to-[#f25f4c] hover:scale-105 transition-all focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                >Grabar</button
+              >
+              <button
+                type="button"
+                id="stopdos"
+                class="cursor-pointer text-white bg-gradient-to-tl from-[#ff8906] to-[#f25f4c] hover:scale-105 transition-all focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >Terminar Grabación</button
               >
             </div>
