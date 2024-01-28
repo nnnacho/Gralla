@@ -62,7 +62,7 @@ window.onload = () => {
         video: { frameRate: { ideal: 60 } },
       });
       const mediarecorder = new MediaRecorder(media, {
-        mimeType: "video/webm;codecs=vp8,opus",
+        mimeType: "video/webm;codecs=vp9",
       });
       mediarecorder.start();
 
@@ -71,10 +71,10 @@ window.onload = () => {
         mediarecorder.stop();
       });
 
-      mediarecorder.addEventListener("dataavailable", (e) => {
+      mediarecorder.addEventListener("dataavailable", async (e) => {
         const link = document.createElement("a");
         link.href = URL.createObjectURL(e.data);
-        link.download = "captura.mp4";
+        link.download = "captura.webm";
         link.click();
       });
     }
