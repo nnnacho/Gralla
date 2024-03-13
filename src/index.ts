@@ -9,7 +9,6 @@ window.onload = () => {
   const stopRecord = document.getElementById("stop-record") as HTMLElement;
   const screen = document.getElementById("screen-option") as HTMLInputElement;
   const mic = document.getElementById("mic-option") as HTMLInputElement;
-  const cam = document.getElementById("cam-option") as HTMLInputElement;
   const closed = document.getElementById("closed") as HTMLElement;
   const video = document.getElementById("video") as HTMLVideoElement;
   const countdown = document.getElementById("countdown");
@@ -37,11 +36,7 @@ window.onload = () => {
       instanceOptions
     );
     //si no se selecciona ninguna opción se lanza un toast de adventencia.
-    if (
-      screen.checked == false &&
-      mic.checked == false &&
-      cam.checked == false
-    ) {
+    if (screen.checked == false && mic.checked == false) {
       Toastify({
         text: "Seleccione al menos una opcion .",
         duration: 1500,
@@ -57,7 +52,7 @@ window.onload = () => {
     }
 
     //Evento que se ejecuta cuando se selecciona la opción de grabar "Pantalla"
-    if (screen.checked && mic.checked === false && cam.checked === false) {
+    if (screen.checked && mic.checked === false) {
       const media = await navigator.mediaDevices.getDisplayMedia({
         video: { frameRate: { ideal: 60 } },
       });
@@ -79,7 +74,7 @@ window.onload = () => {
       });
     }
     //Evento que se ejecuta cuando se selecciona la opción de grabar "Microfono"
-    if (mic.checked && screen.checked === false && cam.checked === false) {
+    if (mic.checked && screen.checked === false) {
       let chunks = [];
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
@@ -153,7 +148,7 @@ window.onload = () => {
       });
     }
     //Evento que se ejecuta cuando se selecciona la opción de grabar "Pantalla y Microfono"
-    if (screen.checked && mic.checked && cam.checked == false) {
+    if (screen.checked && mic.checked) {
       try {
         const screenStream = await navigator.mediaDevices.getDisplayMedia({
           video: { frameRate: { ideal: 60 } },
@@ -189,198 +184,7 @@ window.onload = () => {
         console.error("Error capturing screen and microphone:", error);
       }
     }
-    //Evento que se ejecuta cuando se selecciona la opción de grabar "Camara"
-    if (cam.checked && screen.checked === false && mic.checked === false) {
-      let chunks = [];
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-      });
-      const mediaStream = stream;
-      const mediaRecorder = new MediaRecorder(stream);
 
-      mediaRecorder.addEventListener("dataavailable", (event) => {
-        chunks.push(event.data);
-      });
-      closed.addEventListener("click", () => {
-        modal.hide();
-        stopRecord.setAttribute("disabled", "");
-        countdown.classList.remove("animate-pulse");
-        stopRecord.classList.add("cursor-not-allowed");
-        mediaRecorder.stop();
-        mediaStream.getTracks().forEach((track) => track.stop());
-        modal.isVisible();
-        titleModal.classList.remove("hidden");
-        circleAnimate.classList.add("hidden");
-        video.classList.add("hidden");
-      });
-      modal.show();
-      let totalTime = 3;
-
-      function updateClock() {
-        if (countdown) {
-          countdown.innerHTML = totalTime.toString();
-        }
-
-        if (totalTime === 0 && modal.isVisible()) {
-          console.log("grabando");
-          video.classList.remove("hidden");
-          video.srcObject = mediaStream;
-          video.onloadedmetadata = (ev) => video.play();
-          circleAnimate.classList.remove("hidden");
-          titleModal.classList.add("hidden");
-          countdown.classList.add("animate-pulse");
-          countdown.innerHTML = "Grabando...";
-          stopRecord.classList.remove("cursor-not-allowed");
-          stopRecord.removeAttribute("disabled");
-          mediaRecorder.start();
-          stopRecord.addEventListener("click", () => {
-            mediaRecorder.addEventListener("stop", () => {
-              // Código para descargar
-              const audioBlob = new Blob(chunks, { type: "video/mp4" });
-              const audioUrl = URL.createObjectURL(audioBlob);
-              const link = document.createElement("a");
-              link.href = audioUrl;
-              link.download = "recording.mp4";
-              document.body.appendChild(link);
-              link.click();
-              mediaStream.getTracks().forEach((track) => track.stop());
-              stopRecord.setAttribute("disabled", "");
-              titleModal.classList.remove("hidden");
-              countdown.classList.remove("animate-pulse");
-              circleAnimate.classList.add("hidden");
-              stopRecord.classList.add("cursor-not-allowed");
-              video.classList.add("hidden");
-
-              // Limpiar chunks
-              chunks = [];
-              modal.hide();
-            });
-            mediaRecorder.stop();
-          });
-        } else {
-          if (modal.isVisible()) {
-            console.log(totalTime);
-            totalTime -= 1;
-            setTimeout(updateClock, 1000);
-          } else {
-            totalTime = 3;
-          }
-        }
-      }
-
-      updateClock();
-    }
-    //Evento que se ejecuta cuando se selecciona la opción de grabar "Camara y Microfono"
-    if (cam.checked && screen.checked === false && mic.checked) {
-      let chunks = [];
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
-      const mediaStream = stream;
-      const mediaRecorder = new MediaRecorder(stream);
-
-      mediaRecorder.addEventListener("dataavailable", (event) => {
-        chunks.push(event.data);
-      });
-      //cierra el modal
-      closed.addEventListener("click", () => {
-        modal.hide();
-        stopRecord.setAttribute("disabled", "");
-        countdown.classList.remove("animate-pulse");
-        stopRecord.classList.add("cursor-not-allowed");
-        mediaRecorder.stop();
-        mediaStream.getTracks().forEach((track) => track.stop());
-        titleModal.classList.remove("hidden");
-        circleAnimate.classList.add("hidden");
-        video.classList.add("hidden");
-      });
-
-      modal.show();
-      let totalTime = 3;
-
-      function updateClock() {
-        if (countdown) {
-          countdown.innerHTML = totalTime.toString();
-        }
-
-        if (totalTime === 0 && modal.isVisible()) {
-          video.classList.remove("hidden");
-          video.srcObject = mediaStream;
-          video.onloadedmetadata = (ev) => video.play();
-          circleAnimate.classList.remove("hidden");
-          titleModal.classList.add("hidden");
-          countdown.classList.add("animate-pulse");
-          countdown.innerHTML = "Grabando...";
-          stopRecord.classList.remove("cursor-not-allowed");
-          stopRecord.removeAttribute("disabled");
-          mediaRecorder.start();
-          stopRecord.addEventListener("click", () => {
-            mediaRecorder.addEventListener("stop", () => {
-              // Código para descargar
-              const audioBlob = new Blob(chunks, { type: "video/mp4" });
-              const audioUrl = URL.createObjectURL(audioBlob);
-              const link = document.createElement("a");
-              link.href = audioUrl;
-              link.download = "recording.mp4";
-              document.body.appendChild(link);
-              link.click();
-              mediaStream.getTracks().forEach((track) => track.stop());
-              stopRecord.setAttribute("disabled", "");
-              titleModal.classList.remove("hidden");
-              countdown.classList.remove("animate-pulse");
-              circleAnimate.classList.add("hidden");
-              stopRecord.classList.add("cursor-not-allowed");
-              video.classList.add("hidden");
-
-              // Limpiar chunks
-              chunks = [];
-              modal.hide();
-            });
-            mediaRecorder.stop();
-          });
-        } else {
-          if (modal.isVisible()) {
-            console.log(totalTime);
-            totalTime -= 1;
-            setTimeout(updateClock, 1000);
-          } else {
-            totalTime = 3;
-          }
-        }
-      }
-
-      updateClock();
-    }
     //Funciones aun no realizadas
-    if (screen.checked && cam.checked && mic.checked == false) {
-      Toastify({
-        text: "Esta funcionalidad aún no existe.",
-        duration: 1500,
-        newWindow: true,
-        close: false,
-        gravity: "top",
-        position: "right",
-        style: {
-          background: "linear-gradient(to right, #f25f4c, #ff8906)",
-        },
-        onClick: function () {}, // Callback after click
-      }).showToast();
-    }
-    //Funciones aun no realizadas
-    if (screen.checked && cam.checked && mic.checked) {
-      Toastify({
-        text: "Esta funcionalidad aún no existe.",
-        duration: 1500,
-        newWindow: true,
-        close: false,
-        gravity: "top",
-        position: "right",
-        style: {
-          background: "linear-gradient(to right, #f25f4c, #ff8906)",
-        },
-        onClick: function () {}, // Callback after click
-      }).showToast();
-    }
   });
 };

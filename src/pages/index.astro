@@ -11,7 +11,7 @@ import IconSection from "../components/IconSection.astro";
     </section>
 
     <section class="py-28 w-[1024px] flex flex-col justify-center" id="record">
-      <ul class="grid w-full gap-6 md:grid-cols-3">
+      <ul class="grid w-full gap-6 md:grid-cols-2">
         <li>
           <input
             type="checkbox"
@@ -76,36 +76,6 @@ import IconSection from "../components/IconSection.astro";
               <div class="w-full text-sm">
                 Selecciona esta opción si quieres grabar el audio de tu
                 micrófono.
-              </div>
-            </div>
-          </label>
-        </li>
-        <li>
-          <input type="checkbox" id="cam-option" value="" class="hidden peer" />
-          <label
-            for="cam-option"
-            class="transition-all inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-[#ff8906] hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
-          >
-            <div class="block">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="icon icon-tabler icon-tabler-camera mb-2"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                stroke-width="2"
-                stroke="currentColor"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                ><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path
-                  d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"
-                ></path><path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"
-                ></path></svg
-              >
-              <div class="w-full text-lg font-semibold">Cámara</div>
-              <div class="w-full text-sm">
-                Graba la cámara de tu computadora de manera nativa.
               </div>
             </div>
           </label>
